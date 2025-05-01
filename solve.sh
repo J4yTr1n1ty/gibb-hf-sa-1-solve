@@ -98,8 +98,8 @@ ClientAliveCountMax 2
 Banner /etc/issue.net
 EOF
 
-echo -e "${GREEN}[+] SSH hardened. Restarting ssh${NC}"
-systemctl restart sshd
+echo -e "${GREEN}[+] SSH hardened. Restarting ssh service...${NC}"
+systemctl restart ssh
 
 # Step 3: Configure UFW firewall with default deny
 echo -e "${YELLOW}[*] Configuring UFW firewall...${NC}"
