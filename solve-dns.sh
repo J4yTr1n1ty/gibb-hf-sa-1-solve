@@ -108,6 +108,7 @@ cat >/etc/bind/zones/db.smartlearn.lan <<EOF
 @       IN      NS      ns.smartlearn.lan.
 
 ; A records
+ns      IN      A       192.168.110.60
 vmkl1   IN      A       192.168.110.70
 vmlf1   IN      A       192.168.110.1
 EOF
@@ -127,6 +128,7 @@ cat >/etc/bind/zones/db.smartlearn.dmz <<EOF
 @       IN      NS      ns.smartlearn.dmz.
 
 ; A records
+ns      IN      A       192.168.120.60
 vmlm1   IN      A       192.168.120.60
 www     IN      A       192.168.120.60
 dns     IN      A       192.168.120.60
@@ -148,6 +150,7 @@ cat >/etc/bind/zones/db.110.168.192 <<EOF
 @       IN      NS      ns.smartlearn.lan.
 
 ; PTR Records
+60      IN      PTR     ns.smartlearn.lan.
 70      IN      PTR     vmkl1.smartlearn.lan.
 1       IN      PTR     vmlf1.smartlearn.lan.
 EOF
@@ -167,6 +170,7 @@ cat >/etc/bind/zones/db.120.168.192 <<EOF
 @       IN      NS      ns.smartlearn.dmz.
 
 ; PTR Records
+60      IN      PTR     ns.smartlearn.dmz.
 60      IN      PTR     vmlm1.smartlearn.dmz.
 60      IN      PTR     www.smartlearn.dmz.
 60      IN      PTR     dns.smartlearn.dmz.
