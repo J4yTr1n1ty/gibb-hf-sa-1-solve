@@ -219,8 +219,8 @@ fi
 echo -e "${YELLOW}[*] Enabling BIND service to start on boot...${NC}"
 systemctl enable named
 
-echo -e "${YELLOW}[*] Allowing port 22 through UFW...${NC}"
-ufw allow 22/udp
+echo -e "${YELLOW}[*] Allowing port 53 through UFW...${NC}"
+ufw allow 53/udp
 
 # Final status check
 echo -e "${YELLOW}[*] Checking BIND9 service status...${NC}"
