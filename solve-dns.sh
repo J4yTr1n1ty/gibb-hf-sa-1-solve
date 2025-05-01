@@ -33,10 +33,6 @@ cat >/etc/bind/named.conf.options <<EOF
 options {
     directory "/var/cache/bind";
 
-    // Listen on local interfaces only
-    listen-on { 127.0.0.1; 192.168.110.60; 192.168.120.60; };
-    listen-on-v6 { ::1; };
-
     // Allow queries from local networks only
     allow-query {
         localhost;
@@ -44,24 +40,19 @@ options {
         192.168.120.0/24;
     };
 
-    // Disable recursive queries for security
-    recursion yes;
-    allow-recursion {
-        localhost;
-        192.168.110.0/24;
-        192.168.120.0/24;
-    };
-
     // Forward DNS queries if this server doesn't have the answer
     forwarders {
+        1.1.1.1;
         8.8.8.8;
         8.8.4.4;
     };
 
+    listen-on-v6 { any; };
+
     // Security settings
     auth-nxdomain no;
     version none;
-    dnssec-validation auto;
+    dnssec-validation no;
 };
 EOF
 
@@ -106,15 +97,15 @@ mkdir -p /etc/bind/zones
 echo -e "${YELLOW}[*] Creating zone file for smartlearn.lan...${NC}"
 cat >/etc/bind/zones/db.smartlearn.lan <<EOF
 \$TTL    86400
-@       IN      SOA     vmkl1.smartlearn.lan. admin.smartlearn.lan. (
-                  2025050101         ; Serial
+@       IN      SOA     ns.smartlearn.lan. admin.smartlearn.lan. (
+                           2         ; Serial
                         3600         ; Refresh
                         1800         ; Retry
                        604800         ; Expire
                         86400 )      ; Negative Cache TTL
 
 ; Name servers
-@       IN      NS      vmkl1.smartlearn.lan.
+@       IN      NS      ns.smartlearn.lan.
 
 ; A records
 vmkl1   IN      A       192.168.110.70
@@ -125,15 +116,15 @@ EOF
 echo -e "${YELLOW}[*] Creating zone file for smartlearn.dmz...${NC}"
 cat >/etc/bind/zones/db.smartlearn.dmz <<EOF
 \$TTL    86400
-@       IN      SOA     vmlm1.smartlearn.dmz. admin.smartlearn.dmz. (
-                  2025050101         ; Serial
+@       IN      SOA     ns.smartlearn.dmz. admin.smartlearn.dmz. (
+                           2         ; Serial
                         3600         ; Refresh
                         1800         ; Retry
                        604800         ; Expire
                         86400 )      ; Negative Cache TTL
 
 ; Name servers
-@       IN      NS      vmlm1.smartlearn.dmz.
+@       IN      NS      ns.smartlearn.dmz.
 
 ; A records
 vmlm1   IN      A       192.168.120.60
@@ -146,15 +137,15 @@ EOF
 echo -e "${YELLOW}[*] Creating reverse zone file for 192.168.110.0/24...${NC}"
 cat >/etc/bind/zones/db.110.168.192 <<EOF
 \$TTL    86400
-@       IN      SOA     vmkl1.smartlearn.lan. admin.smartlearn.lan. (
-                  2025050101         ; Serial
+@       IN      SOA     ns.smartlearn.lan. admin.smartlearn.lan. (
+                           2         ; Serial
                         3600         ; Refresh
                         1800         ; Retry
                        604800         ; Expire
                         86400 )      ; Negative Cache TTL
 
 ; Name servers
-@       IN      NS      vmkl1.smartlearn.lan.
+@       IN      NS      ns.smartlearn.lan.
 
 ; PTR Records
 70      IN      PTR     vmkl1.smartlearn.lan.
@@ -165,15 +156,15 @@ EOF
 echo -e "${YELLOW}[*] Creating reverse zone file for 192.168.120.0/24...${NC}"
 cat >/etc/bind/zones/db.120.168.192 <<EOF
 \$TTL    86400
-@       IN      SOA     vmlm1.smartlearn.dmz. admin.smartlearn.dmz. (
-                  2025050101         ; Serial
+@       IN      SOA     ns.smartlearn.dmz. admin.smartlearn.dmz. (
+                           2         ; Serial
                         3600         ; Refresh
                         1800         ; Retry
                        604800         ; Expire
                         86400 )      ; Negative Cache TTL
 
 ; Name servers
-@       IN      NS      vmlm1.smartlearn.dmz.
+@       IN      NS      ns.smartlearn.dmz.
 
 ; PTR Records
 60      IN      PTR     vmlm1.smartlearn.dmz.
