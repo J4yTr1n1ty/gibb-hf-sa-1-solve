@@ -211,20 +211,20 @@ if [ $? -eq 0 ]; then
   echo -e "${GREEN}[+] BIND9 service restarted successfully${NC}"
 else
   echo -e "${RED}[-] Failed to restart BIND9 service${NC}"
-  systemctl status bind9
+  systemctl status named
   exit 1
 fi
 
 # Enable BIND service to start on boot
 echo -e "${YELLOW}[*] Enabling BIND service to start on boot...${NC}"
-systemctl enable bind9
+systemctl enable named
 
 echo -e "${YELLOW}[*] Allowing port 22 through UFW...${NC}"
 ufw allow 22/udp
 
 # Final status check
 echo -e "${YELLOW}[*] Checking BIND9 service status...${NC}"
-systemctl status bind9 --no-pager
+systemctl status named --no-pager
 
 echo -e "${GREEN}[+] DNS server has been installed and configured successfully!${NC}"
 echo -e "${BLUE}[*] DNS zones configured:${NC}"
