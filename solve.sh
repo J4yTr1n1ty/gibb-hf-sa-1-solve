@@ -109,8 +109,7 @@ apt-get install -y ufw
 ufw --force reset
 
 # Set default policies
-ufw default deny incoming
-ufw default allow outgoing
+ufw default deny
 
 # Allow SSH on custom port
 ufw allow 23344/tcp
