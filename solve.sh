@@ -26,30 +26,13 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 # Step 1: Install and configure automatic security updates
-echo -e "${YELLOW}[*] Installing and configuring automatic security updates...${NC}"
+echo -e "${YELLOW}[*] Installing and configuring automatic updates...${NC}"
 apt-get update
-apt-get install -y unattended-upgrades apt-listchanges
-
-# Configure unattended-upgrades
-cat >/etc/apt/apt.conf.d/20auto-upgrades <<EOF
-APT::Periodic::Update-Package-Lists "1";
-APT::Periodic::Unattended-Upgrade "1";
-APT::Periodic::AutocleanInterval "7";
-APT::Periodic::Download-Upgradeable-Packages "1";
-EOF
-
-# Enable security updates only
-cat >/etc/apt/apt.conf.d/50unattended-upgrades <<EOF
-Unattended-Upgrade::Allowed-Origins {
-    "\${distro_id}:\${distro_codename}-security";
-};
-Unattended-Upgrade::Package-Blacklist {
-};
-EOF
+apt-get install -y unattended-upgrades
 
 systemctl enable unattended-upgrades
 systemctl restart unattended-upgrades
-echo -e "${GREEN}[+] Automatic security updates configured${NC}"
+echo -e "${GREEN}[+] Automatic updates configured${NC}"
 
 # Step 2: Harden SSH configuration (without restarting)
 echo -e "${YELLOW}[*] Hardening SSH configuration...${NC}"
