@@ -304,3 +304,20 @@ sudo systemctl restart bind9
 sudo systemctl enable named
 sudo ufw allow 53/udp
 ```
+
+## Banner Grabbing
+
+This section explains how you can use Netcat to grab banners from HTTP and DNS servers.
+
+### 1. HTTP Servers
+
+```bash
+nc 192.168.110.60 80
+HEAD / HTTP/1.1
+```
+
+### 2. DNS Servers
+
+```bash
+echo -ne "\x00\x1c\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07\x76\x65\x72\x73\x69\x6f\x6e\x04\x62\x69\x6e\x64\x00\x00\x10\x00\x03" | nc -u <DNS_SERVER_IP> 53 | xxd -g 1
+```
