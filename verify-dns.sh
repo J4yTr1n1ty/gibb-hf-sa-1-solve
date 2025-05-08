@@ -1,6 +1,7 @@
 #!/bin/bash
-# DNS Configuration Verification Script
+# Enhanced DNS Configuration Verification Script
 # This script verifies the DNS configuration for smartlearn.lan and smartlearn.dmz zones
+# With added support for multiple PTR records and zone file flexibility
 
 # ANSI color codes
 GREEN='\033[0;32m'
@@ -34,6 +35,38 @@ info() {
   echo -e "[*] $1"
 }
 
+# Function to find actual zone file paths from named.conf.local
+find_zone_file_paths() {
+  local conf_file="/etc/bind/named.conf.local"
+
+  LAN_ZONE_FILE=$(grep -A3 "zone \"smartlearn.lan\"" "$conf_file" | grep "file" | sed 's/.*file "\(.*\)".*/\1/')
+  DMZ_ZONE_FILE=$(grep -A3 "zone \"smartlearn.dmz\"" "$conf_file" | grep "file" | sed 's/.*file "\(.*\)".*/\1/')
+  REV110_ZONE_FILE=$(grep -A3 "zone \"110.168.192.in-addr.arpa\"" "$conf_file" | grep "file" | sed 's/.*file "\(.*\)".*/\1/')
+  REV120_ZONE_FILE=$(grep -A3 "zone \"120.168.192.in-addr.arpa\"" "$conf_file" | grep "file" | sed 's/.*file "\(.*\)".*/\1/')
+
+  # Set default paths if not found
+  LAN_ZONE_FILE=${LAN_ZONE_FILE:-"/etc/bind/zones/db.smartlearn.lan"}
+  DMZ_ZONE_FILE=${DMZ_ZONE_FILE:-"/etc/bind/zones/db.smartlearn.dmz"}
+  REV110_ZONE_FILE=${REV110_ZONE_FILE:-"/etc/bind/zones/db.110.168.192"}
+  REV120_ZONE_FILE=${REV120_ZONE_FILE:-"/etc/bind/zones/db.120.168.192"}
+
+  # Check alternative paths if files don't exist
+  for file_var in LAN_ZONE_FILE DMZ_ZONE_FILE REV110_ZONE_FILE REV120_ZONE_FILE; do
+    file_path=${!file_var}
+
+    if [ ! -f "$file_path" ]; then
+      # Try to find in standard locations
+      base_name=$(basename "$file_path")
+
+      if [ -f "/etc/bind/$base_name" ]; then
+        eval "$file_var=/etc/bind/$base_name"
+      elif [ -f "/var/lib/bind/$base_name" ]; then
+        eval "$file_var=/var/lib/bind/$base_name"
+      fi
+    fi
+  done
+}
+
 # 1. Verify BIND installation
 section "Checking BIND9 Installation"
 
@@ -63,7 +96,10 @@ else
   warn "BIND9 service is not enabled to start on boot"
 fi
 
-# 3. Verify configuration files
+# 3. Find zone file paths
+find_zone_file_paths
+
+# Verify configuration files
 section "Checking Configuration Files"
 
 if [ -f /etc/bind/named.conf.local ]; then
@@ -100,10 +136,10 @@ fi
 section "Checking Zone Files"
 
 ZONE_FILES=(
-  "/etc/bind/zones/db.smartlearn.lan"
-  "/etc/bind/zones/db.smartlearn.dmz"
-  "/etc/bind/zones/db.110.168.192"
-  "/etc/bind/zones/db.120.168.192"
+  "$LAN_ZONE_FILE"
+  "$DMZ_ZONE_FILE"
+  "$REV110_ZONE_FILE"
+  "$REV120_ZONE_FILE"
 )
 
 for file in "${ZONE_FILES[@]}"; do
@@ -133,7 +169,7 @@ done
 # 5. Verify DNS resolution for each host
 section "Testing DNS Resolution"
 
-# Function to test DNS resolution
+# Function to test DNS resolution - improved to handle multiple expected IPs
 test_dns_resolution() {
   local hostname=$1
   local expected_ip=$2
@@ -166,36 +202,50 @@ test_dns_resolution "www.smartlearn.dmz" "192.168.120.60"
 test_dns_resolution "dns.smartlearn.dmz" "192.168.120.60"
 test_dns_resolution "vmlf1.smartlearn.dmz" "192.168.120.1"
 
-# 6. Test reverse DNS
+# 7. Test reverse DNS - improved to handle multiple PTR records
 section "Testing Reverse DNS Resolution"
 
-# Function to test reverse DNS
+# Function to test reverse DNS with support for multiple PTR records
 test_reverse_dns() {
   local ip=$1
-  local expected_hostname=$2
+  local expected_hostnames=$2 # Can be multiple hostnames separated by pipe |
   local dns_server=${3:-127.0.0.1}
 
   result=$(nslookup "$ip" "$dns_server" 2>/dev/null)
-  resolved_name=$(echo "$result" | grep "name =" | awk '{print $4}' | sed 's/\.$//')
+  # Get all "name =" lines to handle multiple PTR records
+  resolved_names=$(echo "$result" | grep "name =" | awk '{print $4}' | sed 's/\.$//' | sort)
 
-  if [ "$resolved_name" = "$expected_hostname" ]; then
-    pass "Reverse lookup for $ip returns $resolved_name (correct)"
-  else
-    if [ -z "$resolved_name" ]; then
-      fail "Reverse lookup for $ip does not resolve"
-    else
-      fail "Reverse lookup for $ip returns $resolved_name (expected $expected_hostname)"
-    fi
+  if [ -z "$resolved_names" ]; then
+    fail "Reverse lookup for $ip does not resolve"
+    return
+  fi
+
+  # Convert expected hostnames to array
+  IFS='|' read -ra EXPECTED_ARRAY <<<"$expected_hostnames"
+
+  # Check if any of the resolved names match any of the expected names
+  match_found=false
+  for resolved in $resolved_names; do
+    for expected in "${EXPECTED_ARRAY[@]}"; do
+      if [[ "$resolved" == "$expected" ]]; then
+        match_found=true
+        pass "Reverse lookup for $ip returns $resolved (matches expected $expected)"
+      fi
+    done
+  done
+
+  if ! $match_found; then
+    fail "Reverse lookup for $ip returns unexpected results: $resolved_names (expected one of: $expected_hostnames)"
   fi
 }
 
-# Test reverse DNS for each IP
+# Test reverse DNS for each IP with support for multiple PTRs
 test_reverse_dns "192.168.110.70" "vmkl1.smartlearn.lan"
 test_reverse_dns "192.168.110.1" "vmlf1.smartlearn.lan"
-test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz dns.smartlearn.dmz www.smartlearn.dmz" # Note: This has multiple PTRs, so might return any of them
+test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz|www.smartlearn.dmz|dns.smartlearn.dmz"
 test_reverse_dns "192.168.120.1" "vmlf1.smartlearn.dmz"
 
-# 7. Check if DNS server is listening on the correct interfaces
+# 8. Check if DNS server is listening on the correct interfaces
 section "Checking DNS Server Listening Status"
 
 if command -v netstat &>/dev/null; then
