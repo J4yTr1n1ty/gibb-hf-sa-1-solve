@@ -18,6 +18,19 @@ chmod +x verify-hardening.sh
 sudo ./verify-hardening.sh
 ```
 
+##### Checklist
+
+- [ ] Automatic updates are enabled `sudo systemctl status unattended-upgrades`
+- [ ] SSH is running on a custom port `sudo systemctl status ssh`
+  - [ ] `Port 23344`
+- [ ] SSH password authentication is disabled (key-only authentication) `cat /etc/ssh/sshd_config`
+  - [ ] `PasswordAuthentication no`
+  - [ ] `PubkeyAuthentication yes`
+- [ ] UFW configured `sudo ufw status verbose`
+  - [ ] UFW is active
+  - [ ] Default deny incoming
+  - [ ] Allow port 23344
+
 ### DNS
 
 ```bash
