@@ -141,7 +141,7 @@ if command -v ufw >/dev/null; then
       fail "UFW default deny incoming policy is not set"
     fi
 
-    if ufw status verbose | grep -q "Default: allow (outgoing)"; then
+    if ufw status verbose | grep -q "allow (outgoing)"; then
       pass "UFW default allow outgoing policy is set"
     else
       fail "UFW default allow outgoing policy is not set"
