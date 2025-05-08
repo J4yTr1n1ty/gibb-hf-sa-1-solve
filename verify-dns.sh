@@ -192,7 +192,7 @@ test_reverse_dns() {
 # Test reverse DNS for each IP
 test_reverse_dns "192.168.110.70" "vmkl1.smartlearn.lan"
 test_reverse_dns "192.168.110.1" "vmlf1.smartlearn.lan"
-test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz" # Note: This has multiple PTRs, so might return any of them
+test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz dns.smartlearn.dmz www.smartlearn.dmz" # Note: This has multiple PTRs, so might return any of them
 test_reverse_dns "192.168.120.1" "vmlf1.smartlearn.dmz"
 
 # 7. Check if DNS server is listening on the correct interfaces
