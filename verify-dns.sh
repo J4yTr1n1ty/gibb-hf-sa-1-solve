@@ -195,12 +195,16 @@ echo -e "${YELLOW}[!] Using the local DNS server for resolution tests${NC}"
 # smartlearn.lan hosts
 test_dns_resolution "vmkl1.smartlearn.lan" "192.168.110.70"
 test_dns_resolution "vmlf1.smartlearn.lan" "192.168.110.1"
+test_dns_resolution "li232-vmKL1.smartlearn.lan" "192.168.110.70"
+test_dns_resolution "if227-vmLF1.smartlearn.lan" "192.168.110.1"
 
 # smartlearn.dmz hosts
 test_dns_resolution "vmlm1.smartlearn.dmz" "192.168.120.60"
 test_dns_resolution "www.smartlearn.dmz" "192.168.120.60"
 test_dns_resolution "dns.smartlearn.dmz" "192.168.120.60"
 test_dns_resolution "vmlf1.smartlearn.dmz" "192.168.120.1"
+test_dns_resolution "li223-vmLM1.smartlearn.dmz" "192.168.120.60"
+test_dns_resolution "if227-vmLF1.smartlearn.dmz" "192.168.120.1"
 
 # 7. Test reverse DNS - improved to handle multiple PTR records
 section "Testing Reverse DNS Resolution"
@@ -242,8 +246,8 @@ test_reverse_dns() {
 # Test reverse DNS for each IP with support for multiple PTRs
 test_reverse_dns "192.168.110.70" "vmkl1.smartlearn.lan"
 test_reverse_dns "192.168.110.1" "vmlf1.smartlearn.lan"
-test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz|www.smartlearn.dmz|dns.smartlearn.dmz"
-test_reverse_dns "192.168.120.1" "vmlf1.smartlearn.dmz"
+test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz|www.smartlearn.dmz|dns.smartlearn.dmz|li223-vmLM1.smartlearn.dmz"
+test_reverse_dns "192.168.120.1" "vmlf1.smartlearn.dmz|if227-vmLF1.smartlearn.dmz"
 
 # 8. Check if DNS server is listening on the correct interfaces
 section "Checking DNS Server Listening Status"
@@ -272,14 +276,3 @@ fi
 section "DNS Configuration Verification Summary"
 echo -e "The DNS verification check has been completed."
 echo -e "Review any ${RED}[-] Failed${NC} or ${YELLOW}[!] Warning${NC} items above and take appropriate action."
-echo -e "\nExpected configuration based on the provided table:"
-echo -e "--------------------------------------------------------"
-echo -e "| Hostname | IP Address     | Domain          |"
-echo -e "--------------------------------------------------------"
-echo -e "| vmkl1    | 192.168.110.70 | smartlearn.lan  |"
-echo -e "| vmlm1    | 192.168.120.60 | smartlearn.dmz  |"
-echo -e "| www      | 192.168.120.60 | smartlearn.dmz  |"
-echo -e "| dns      | 192.168.120.60 | smartlearn.dmz  |"
-echo -e "| vmlf1    | 192.168.110.1  | smartlearn.lan  |"
-echo -e "| vmlf1    | 192.168.120.1  | smartlearn.dmz  |"
-echo -e "--------------------------------------------------------"
