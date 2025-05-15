@@ -132,7 +132,7 @@ cat >/etc/bind/zones/db.smartlearn.dmz <<EOF
 ; A records
 vmlm1   IN      A       192.168.120.60
 www     IN      A       192.168.120.60
-dns     IN      A       192.168.110.60
+dns     IN      A       192.168.120.60
 vmlf1   IN      A       192.168.120.1
 li223-vmLM1 IN  A       192.168.120.60
 if227-vmLF1 IN  A       192.168.120.1
