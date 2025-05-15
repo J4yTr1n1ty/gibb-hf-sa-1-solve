@@ -112,7 +112,7 @@ dns      IN      A       192.168.120.60
 vmkl1   IN      A       192.168.110.70
 vmlf1   IN      A       192.168.110.1
 li232-vmKL1 IN  A       192.168.110.70
-li227-vMLF1 IN  A       192.168.110.1
+if227-vmLF1 IN  A       192.168.110.1
 EOF
 
 # Create zone file for smartlearn.dmz
@@ -135,7 +135,7 @@ www     IN      A       192.168.120.60
 dns     IN      A       192.168.110.60
 vmlf1   IN      A       192.168.120.1
 li223-vmLM1 IN  A       192.168.120.60
-if227-VMLF1 IN  A       192.168.120.1
+if227-vmLF1 IN  A       192.168.120.1
 EOF
 
 # Create reverse zone file for 192.168.110.0/24
@@ -157,7 +157,7 @@ cat >/etc/bind/zones/db.110.168.192 <<EOF
 70      IN      PTR     vmkl1.smartlearn.lan.
 70      IN      PTR     li232-vmKL1.smartlearn.lan.
 1       IN      PTR     vmlf1.smartlearn.lan.
-1       IN      PTR     li227-VMLF1.smartlearn.lan.
+1       IN      PTR     if227-vmLF1.smartlearn.lan.
 EOF
 
 # Create reverse zone file for 192.168.120.0/24
@@ -180,7 +180,7 @@ cat >/etc/bind/zones/db.120.168.192 <<EOF
 60      IN      PTR     dns.smartlearn.dmz.
 60      IN      PTR     li223-vmLM1.smartlearn.dmz.
 1       IN      PTR     vmlf1.smartlearn.dmz.
-1       IN      PTR     li227-VMLF1.smartlearn.dmz.
+1       IN      PTR     if227-vmLF1.smartlearn.dmz.
 EOF
 
 # Set proper permissions
