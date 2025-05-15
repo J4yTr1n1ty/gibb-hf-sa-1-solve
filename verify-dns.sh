@@ -244,8 +244,8 @@ test_reverse_dns() {
 }
 
 # Test reverse DNS for each IP with support for multiple PTRs
-test_reverse_dns "192.168.110.70" "vmkl1.smartlearn.lan"
-test_reverse_dns "192.168.110.1" "vmlf1.smartlearn.lan"
+test_reverse_dns "192.168.110.70" "vmkl1.smartlearn.lan|li232-vmKL1.smartlearn.lan"
+test_reverse_dns "192.168.110.1" "vmlf1.smartlearn.lan|if227-vmLF1.smartlearn.lan"
 test_reverse_dns "192.168.120.60" "vmlm1.smartlearn.dmz|www.smartlearn.dmz|dns.smartlearn.dmz|li223-vmLM1.smartlearn.dmz"
 test_reverse_dns "192.168.120.1" "vmlf1.smartlearn.dmz|if227-vmLF1.smartlearn.dmz"
 

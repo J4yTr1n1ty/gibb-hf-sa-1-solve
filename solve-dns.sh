@@ -112,7 +112,7 @@ dns      IN      A       192.168.120.60
 vmkl1   IN      A       192.168.110.70
 vmlf1   IN      A       192.168.110.1
 li232-vmKL1 IN  A       192.168.110.70
-li227-VMLF1 IN  A       192.168.110.1
+li227-vMLF1 IN  A       192.168.110.1
 EOF
 
 # Create zone file for smartlearn.dmz
