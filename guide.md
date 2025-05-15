@@ -1,5 +1,7 @@
 # Manual Setup Guide
 
+> OUT OF DATE
+
 This guide provides step-by-step instructions for server hardening and DNS setup without using the automated scripts.
 
 ## Server Hardening Guide
